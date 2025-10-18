@@ -1,0 +1,37 @@
+{
+    "name": "@openask/sdk",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Typed API client for OpenAsk",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "tsc --watch",
+        "build": "tsc",
+        "lint": "eslint \"src/**/*.{ts,tsx}\" --ignore-pattern \"**/__tests__/**\"",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "zod": "^3.22.4"
+    },
+    "devDependencies": {
+        "@openask/config": "workspace:*",
+        "@types/node": "^20.10.0",
+        "eslint": "^8.56.0",
+        "@typescript-eslint/eslint-plugin": "^6.15.0",
+        "@typescript-eslint/parser": "^6.15.0",
+        "typescript": "^5.3.3",
+        "vitest": "^1.0.4"
+    }
+}

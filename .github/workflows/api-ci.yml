@@ -1,0 +1,91 @@
+name: API CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/api/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/api-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "packages/**"
+
+jobs:
+  api-ci:
+    name: API Lint, Type Check, Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        node-version: [18, 20]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint API
+        run: pnpm --filter @openask/api lint
+        continue-on-error: false
+
+      - name: Type check API
+        run: pnpm --filter @openask/api typecheck
+        continue-on-error: false
+
+      - name: Run API tests
+        run: pnpm --filter @openask/api test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://127.0.0.1:27017/openask-test
+          WEB_ORIGIN: http://localhost:5173
+          AUTH0_DOMAIN: test.auth0.com
+          AUTH0_AUDIENCE: https://api.openask.test
+          LOG_LEVEL: error
+
+      - name: Build API
+        run: pnpm --filter @openask/api build
+        continue-on-error: false
+
+      - name: Upload build artifacts
+        if: success() && matrix.node-version == 20
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-dist
+          path: apps/api/dist
+          retention-days: 7
+
+  # Optional: Add deployment job
+  # deploy:
+  #   name: Deploy API
+  #   needs: api-ci
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: api-dist
+  #         path: dist
+  #
+  #     - name: Deploy to production
+  #       run: |
+  #         # Add your deployment steps here
+  #         echo "Deploying to production..."

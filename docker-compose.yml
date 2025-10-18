@@ -1,0 +1,87 @@
+version: '3.9'
+
+services:
+  # MongoDB database
+  mongodb:
+    image: mongo:7
+    container_name: openask-mongodb
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: openask
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - openask-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API backend
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: openask-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/openask?authSource=admin
+      WEB_ORIGIN: http://localhost:5173
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 100
+      LOG_LEVEL: info
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - openask-network
+    volumes:
+      - ./apps/api:/app/apps/api
+      - /app/apps/api/node_modules
+      - /app/node_modules
+
+  # Web frontend (optional, if running both locally)
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/web/Dockerfile
+  #   container_name: openask-web
+  #   restart: unless-stopped
+  #   ports:
+  #     - '5173:5173'
+  #   environment:
+  #     VITE_API_URL: http://localhost:3000/api/v1
+  #     VITE_AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+  #     VITE_AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+  #     VITE_AUTH0_AUDIENCE: ${AUTH0_AUDIENCE}
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - openask-network
+  #   volumes:
+  #     - ./apps/web:/app/apps/web
+  #     - /app/apps/web/node_modules
+  #     - /app/node_modules
+
+networks:
+  openask-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local

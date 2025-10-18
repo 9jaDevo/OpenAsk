@@ -1,0 +1,29 @@
+{
+    "name": "openask",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Open-source community Q&A platform with AI-powered draft answers",
+    "author": "OpenAsk Contributors",
+    "license": "MIT",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "pnpm -r --parallel dev",
+        "build": "pnpm -r build",
+        "lint": "pnpm -r lint",
+        "test": "pnpm -r test",
+        "typecheck": "pnpm -r typecheck",
+        "clean": "pnpm -r exec rm -rf dist node_modules .turbo"
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.0",
+        "prettier": "^3.1.1",
+        "typescript": "^5.3.3"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "pnpm": ">=8.0.0"
+    }
+}

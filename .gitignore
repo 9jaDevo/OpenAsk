@@ -1,0 +1,86 @@
+# OpenAsk monorepo .gitignore (public repo safe defaults)
+# Node/PNPM/NPM
+node_modules/
+pnpm-lock.yaml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build outputs
+**/dist/
+**/build/
+**/.turbo/
+**/.cache/
+**/.next/
+
+# Vite & cache
+**/.vite/
+**/vite.config.timestamp-*.mjs
+
+# TypeScript
+**/*.tsbuildinfo
+
+# Testing
+coverage/
+**/coverage/
+.jest/
+.vitest/
+
+# Env & secrets
+*.env
+*.env.*
+!.env.example
+**/.env
+**/.env.*
+!apps/api/.env.example
+!apps/web/.env.example
+
+# Logs
+logs/
+**/logs/
+*.log
+*.log.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Generated docs/artifacts
+**/docs-dist/
+
+# DB/Runtime
+**/data/
+**/tmp/
+.tmp/
+
+# Images/recordings (optional large)
+**/recordings/
+**/screenshots/
+
+# AI prompts and private explanations
+# Hide agent prompts if desired (this project keeps a public spec in ProjectScope.txt)
+.github/copilot-instructions.md
+AGENT.md
+AGENTS.md
+CLAUDE.md
+.cursorrules
+.windsurfrules
+.clinerules
+cursor/rules/
+.windsurf/rules/
+.clinerules/
+
+# Private explanations folder (all non-README explanation/bug-fix notes)
+# Place any ad-hoc writeups in /private-notes/ to avoid publishing
+private-notes/
+private-notes/**
+ProjectScope.txt
+
+# Ensure README stays tracked even inside private-notes
+!private-notes/README.md

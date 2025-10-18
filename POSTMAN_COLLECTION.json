@@ -1,0 +1,917 @@
+{
+    "info": {
+        "name": "OpenAsk API",
+        "_postman_id": "openask-api-collection",
+        "description": "Complete API collection for OpenAsk - A Q&A platform with AI-powered draft answers.\n\n## Features\n- Auth0 JWT authentication\n- Questions CRUD with voting\n- Answers CRUD with voting\n- AI-powered draft answers (Gemini)\n- Full-text search\n- Tag aggregation\n- Pagination support\n\n## Setup Instructions\n\n### 1. Environment Variables\nCreate a Postman environment with these variables:\n- `base_url`: http://localhost:3001\n- `auth0_domain`: your-tenant.auth0.com\n- `auth0_client_id`: your-client-id\n- `auth0_client_secret`: your-client-secret\n- `auth0_audience`: your-api-audience\n- `access_token`: (will be set automatically)\n\n### 2. Get Access Token\nRun the \"Get Access Token\" request in the Auth folder to authenticate. The token will be saved automatically.\n\n### 3. Test Endpoints\nAll authenticated endpoints will use the saved token automatically.\n\n## API Version\nv1.0.0",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3001",
+            "type": "string"
+        },
+        {
+            "key": "api_prefix",
+            "value": "/api/v1",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Get Access Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save access token to environment",
+                                    "const response = pm.response.json();",
+                                    "if (response.access_token) {",
+                                    "    pm.environment.set('access_token', response.access_token);",
+                                    "    console.log('✅ Access token saved');",
+                                    "} else {",
+                                    "    console.error('❌ No access token in response');",
+                                    "}",
+                                    "",
+                                    "// Verify token was received",
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Access token exists', function() {",
+                                    "    pm.expect(response.access_token).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"client_id\": \"{{auth0_client_id}}\",\n  \"client_secret\": \"{{auth0_client_secret}}\",\n  \"audience\": \"{{auth0_audience}}\",\n  \"grant_type\": \"client_credentials\"\n}"
+                        },
+                        "url": {
+                            "raw": "https://{{auth0_domain}}/oauth/token",
+                            "protocol": "https",
+                            "host": [
+                                "{{auth0_domain}}"
+                            ],
+                            "path": [
+                                "oauth",
+                                "token"
+                            ]
+                        },
+                        "description": "Obtain an Auth0 access token for API requests.\n\n**Required Environment Variables:**\n- `auth0_domain`: Your Auth0 tenant domain\n- `auth0_client_id`: Your Auth0 application client ID\n- `auth0_client_secret`: Your Auth0 application client secret\n- `auth0_audience`: Your API audience/identifier\n\n**Note:** For user authentication (frontend), use Auth0's Authorization Code Flow with PKCE. This endpoint uses Client Credentials for testing."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Authentication endpoints for obtaining access tokens"
+        },
+        {
+            "name": "Health",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has status field', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.status).to.exist;",
+                                    "});",
+                                    "",
+                                    "pm.test('Database is connected', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.database).to.equal('connected');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/health",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "health"
+                            ]
+                        },
+                        "description": "Check API and database health status.\n\n**Authentication:** None required\n\n**Response:**\n```json\n{\n  \"status\": \"ok\",\n  \"timestamp\": \"2024-01-20T10:30:00.000Z\",\n  \"database\": \"connected\"\n}\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"status\": \"ok\",\n  \"timestamp\": \"2024-01-20T10:30:00.000Z\",\n  \"database\": \"connected\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "Health check endpoints"
+        },
+        {
+            "name": "Profile",
+            "item": [
+                {
+                    "name": "Get User Profile",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has user fields', function() {",
+                                    "    const user = pm.response.json();",
+                                    "    pm.expect(user._id).to.exist;",
+                                    "    pm.expect(user.auth0Id).to.exist;",
+                                    "    pm.expect(user.email).to.exist;",
+                                    "    pm.expect(user.name).to.exist;",
+                                    "});",
+                                    "",
+                                    "// Save user ID for other requests",
+                                    "const user = pm.response.json();",
+                                    "pm.environment.set('user_id', user._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "profile"
+                            ]
+                        },
+                        "description": "Get authenticated user's profile. Creates user if first login.\n\n**Authentication:** Required\n\n**Response:**\n```json\n{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"auth0Id\": \"auth0|123456789\",\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\",\n  \"role\": \"user\",\n  \"createdAt\": \"2024-01-20T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-20T10:00:00.000Z\"\n}\n```"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"auth0Id\": \"auth0|123456789\",\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\",\n  \"role\": \"user\",\n  \"createdAt\": \"2024-01-20T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-20T10:00:00.000Z\"\n}"
+                        }
+                    ]
+                }
+            ],
+            "description": "User profile endpoints"
+        },
+        {
+            "name": "Questions",
+            "item": [
+                {
+                    "name": "List Questions",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has pagination', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.items).to.be.an('array');",
+                                    "    pm.expect(response.pagination).to.exist;",
+                                    "});",
+                                    "",
+                                    "// Save first question ID",
+                                    "const response = pm.response.json();",
+                                    "if (response.items.length > 0) {",
+                                    "    pm.environment.set('question_id', response.items[0]._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions?page=1&limit=10&sort=new",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number (default: 1)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Items per page (max: 50, default: 10)"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "new",
+                                    "description": "Sort by: new | votes | answers"
+                                },
+                                {
+                                    "key": "tag",
+                                    "value": "javascript",
+                                    "disabled": true,
+                                    "description": "Filter by tag"
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "search query",
+                                    "disabled": true,
+                                    "description": "Full-text search query"
+                                }
+                            ]
+                        },
+                        "description": "List questions with pagination and filtering.\n\n**Authentication:** Optional (shows user votes if authenticated)\n\n**Query Parameters:**\n- `page` (number): Page number (default: 1)\n- `limit` (number): Items per page (max: 50, default: 10)\n- `sort` (string): Sort by new | votes | answers (default: new)\n- `tag` (string): Filter by tag\n- `q` (string): Full-text search query\n\n**Response:**\n```json\n{\n  \"items\": [\n    {\n      \"_id\": \"...\",\n      \"title\": \"How to...\",\n      \"body\": \"...\",\n      \"tags\": [\"javascript\"],\n      \"authorId\": \"...\",\n      \"answerCount\": 5,\n      \"voteCount\": 10,\n      \"status\": \"open\",\n      \"userVote\": 1,\n      \"createdAt\": \"...\",\n      \"updatedAt\": \"...\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 5,\n    \"totalCount\": 42,\n    \"hasNextPage\": true,\n    \"hasPrevPage\": false\n  }\n}\n```"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Question by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Question has required fields', function() {",
+                                    "    const question = pm.response.json();",
+                                    "    pm.expect(question._id).to.exist;",
+                                    "    pm.expect(question.title).to.exist;",
+                                    "    pm.expect(question.body).to.exist;",
+                                    "    pm.expect(question.tags).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions/{{question_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions",
+                                "{{question_id}}"
+                            ]
+                        },
+                        "description": "Get a single question by ID with populated author.\n\n**Authentication:** Optional\n\n**Path Parameters:**\n- `id`: Question ID (MongoDB ObjectId)\n\n**Response:**\n```json\n{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"title\": \"How to use async/await in JavaScript?\",\n  \"body\": \"I'm trying to understand...\",\n  \"tags\": [\"javascript\", \"async\"],\n  \"authorId\": \"507f191e810c19729de860ea\",\n  \"author\": {\n    \"_id\": \"507f191e810c19729de860ea\",\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\"\n  },\n  \"aiDraftAnswer\": \"To use async/await...\",\n  \"answerCount\": 5,\n  \"voteCount\": 10,\n  \"status\": \"open\",\n  \"userVote\": 1,\n  \"createdAt\": \"2024-01-20T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-20T10:00:00.000Z\"\n}\n```"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Question",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 201', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Question created with AI draft', function() {",
+                                    "    const question = pm.response.json();",
+                                    "    pm.expect(question._id).to.exist;",
+                                    "    pm.expect(question.title).to.exist;",
+                                    "    pm.expect(question.aiDraftAnswer).to.exist;",
+                                    "});",
+                                    "",
+                                    "// Save question ID",
+                                    "const question = pm.response.json();",
+                                    "pm.environment.set('new_question_id', question._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"How to implement pagination in MongoDB with Mongoose?\",\n  \"body\": \"I'm building a REST API and need to implement efficient pagination for large collections. What's the best approach using Mongoose? Should I use skip/limit or cursor-based pagination?\",\n  \"tags\": [\"mongodb\", \"mongoose\", \"pagination\", \"nodejs\"]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions"
+                            ]
+                        },
+                        "description": "Create a new question with AI-generated draft answer.\n\n**Authentication:** Required\n\n**Request Body:**\n```json\n{\n  \"title\": \"string (10-160 chars)\",\n  \"body\": \"string (min 20 chars)\",\n  \"tags\": [\"string\"] // 1-5 tags\n}\n```\n\n**Response:**\n```json\n{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"title\": \"...\",\n  \"body\": \"...\",\n  \"tags\": [...],\n  \"authorId\": \"...\",\n  \"aiDraftAnswer\": \"AI-generated draft answer...\",\n  \"answerCount\": 0,\n  \"voteCount\": 0,\n  \"status\": \"open\",\n  \"createdAt\": \"2024-01-20T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-20T10:00:00.000Z\"\n}\n```\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Question",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Question updated', function() {",
+                                    "    const question = pm.response.json();",
+                                    "    pm.expect(question._id).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"How to implement efficient pagination in MongoDB?\",\n  \"body\": \"I'm building a REST API with Node.js and MongoDB. I need to implement pagination for large collections. What's the best approach - skip/limit or cursor-based? Please provide examples.\",\n  \"tags\": [\"mongodb\", \"mongoose\", \"pagination\", \"performance\"],\n  \"status\": \"open\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions/{{new_question_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions",
+                                "{{new_question_id}}"
+                            ]
+                        },
+                        "description": "Update an existing question (author only).\n\n**Authentication:** Required (must be question author)\n\n**Path Parameters:**\n- `id`: Question ID\n\n**Request Body (all optional):**\n```json\n{\n  \"title\": \"string (10-160 chars)\",\n  \"body\": \"string (min 20 chars)\",\n  \"tags\": [\"string\"], // 1-5 tags\n  \"status\": \"open\" | \"resolved\"\n}\n```\n\n**Response:** Updated Question object\n\n**Errors:**\n- 404: Question not found\n- 403: Not authorized (not the author)\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Vote on Question",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has voteCount', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.voteCount).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"value\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions/{{question_id}}/vote",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions",
+                                "{{question_id}}",
+                                "vote"
+                            ]
+                        },
+                        "description": "Vote on a question (upvote or downvote).\n\n**Authentication:** Required\n\n**Path Parameters:**\n- `id`: Question ID\n\n**Request Body:**\n```json\n{\n  \"value\": 1 | -1  // 1 for upvote, -1 for downvote\n}\n```\n\n**Response:**\n```json\n{\n  \"voteCount\": 10,\n  \"userVote\": 1\n}\n```\n\n**Behavior:**\n- First vote: Creates vote\n- Same value: Removes vote (toggle)\n- Different value: Changes vote\n- One vote per user per question\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Question management endpoints"
+        },
+        {
+            "name": "Answers",
+            "item": [
+                {
+                    "name": "List Answers",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has pagination', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.items).to.be.an('array');",
+                                    "    pm.expect(response.pagination).to.exist;",
+                                    "});",
+                                    "",
+                                    "// Save first answer ID",
+                                    "const response = pm.response.json();",
+                                    "if (response.items.length > 0) {",
+                                    "    pm.environment.set('answer_id', response.items[0]._id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions/{{question_id}}/answers?page=1&limit=10&sort=votes",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions",
+                                "{{question_id}}",
+                                "answers"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "votes",
+                                    "description": "Sort by: votes | new"
+                                }
+                            ]
+                        },
+                        "description": "List answers for a question.\n\n**Authentication:** Optional\n\n**Path Parameters:**\n- `questionId`: Question ID\n\n**Query Parameters:**\n- `page` (number): Page number (default: 1)\n- `limit` (number): Items per page (max: 50, default: 10)\n- `sort` (string): Sort by votes | new (default: votes)\n\n**Response:**\n```json\n{\n  \"items\": [\n    {\n      \"_id\": \"...\",\n      \"questionId\": \"...\",\n      \"body\": \"...\",\n      \"authorId\": \"...\",\n      \"author\": {...},\n      \"voteCount\": 5,\n      \"isEdited\": false,\n      \"userVote\": 1,\n      \"createdAt\": \"...\",\n      \"updatedAt\": \"...\"\n    }\n  ],\n  \"pagination\": {...}\n}\n```"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Answer",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 201', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Answer created', function() {",
+                                    "    const answer = pm.response.json();",
+                                    "    pm.expect(answer._id).to.exist;",
+                                    "    pm.expect(answer.body).to.exist;",
+                                    "});",
+                                    "",
+                                    "// Save answer ID",
+                                    "const answer = pm.response.json();",
+                                    "pm.environment.set('new_answer_id', answer._id);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"body\": \"For efficient pagination in MongoDB with Mongoose, I recommend using cursor-based pagination with `_id` instead of skip/limit for large datasets. Here's why:\\n\\n1. **Performance**: Skip/limit becomes slow on large collections because MongoDB must scan through all skipped documents.\\n\\n2. **Consistency**: Cursor-based pagination handles insertions better - new items won't shift your results.\\n\\n**Example Implementation:**\\n\\n```javascript\\n// First page\\nconst firstPage = await Model.find().limit(10).sort({ _id: -1 });\\n\\n// Next page\\nconst lastId = firstPage[firstPage.length - 1]._id;\\nconst nextPage = await Model.find({ _id: { $lt: lastId } })\\n  .limit(10)\\n  .sort({ _id: -1 });\\n```\\n\\nThis scales much better for large collections!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/questions/{{question_id}}/answers",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "questions",
+                                "{{question_id}}",
+                                "answers"
+                            ]
+                        },
+                        "description": "Create an answer for a question.\n\n**Authentication:** Required\n\n**Path Parameters:**\n- `questionId`: Question ID\n\n**Request Body:**\n```json\n{\n  \"body\": \"string (min 20 chars)\"\n}\n```\n\n**Response:**\n```json\n{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"questionId\": \"507f191e810c19729de860ea\",\n  \"body\": \"...\",\n  \"authorId\": \"...\",\n  \"voteCount\": 0,\n  \"isEdited\": false,\n  \"createdAt\": \"2024-01-20T10:00:00.000Z\",\n  \"updatedAt\": \"2024-01-20T10:00:00.000Z\"\n}\n```\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Answer",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Answer updated and marked as edited', function() {",
+                                    "    const answer = pm.response.json();",
+                                    "    pm.expect(answer.isEdited).to.be.true;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"body\": \"For efficient pagination in MongoDB with Mongoose, I recommend using cursor-based pagination instead of skip/limit for large datasets.\\n\\n**Why Cursor-Based is Better:**\\n\\n1. **Performance**: Skip/limit becomes exponentially slower on large collections because MongoDB must scan through all skipped documents.\\n\\n2. **Consistency**: Cursor-based pagination handles concurrent insertions better - new items won't shift your results between pages.\\n\\n3. **Scalability**: Works well even with millions of documents.\\n\\n**Implementation Example:**\\n\\n```javascript\\n// First page\\nconst limit = 10;\\nconst firstPage = await Question.find()\\n  .sort({ createdAt: -1, _id: -1 })\\n  .limit(limit);\\n\\n// Next page using cursor\\nconst lastDoc = firstPage[firstPage.length - 1];\\nconst nextPage = await Question.find({\\n  $or: [\\n    { createdAt: { $lt: lastDoc.createdAt } },\\n    { createdAt: lastDoc.createdAt, _id: { $lt: lastDoc._id } }\\n  ]\\n})\\n  .sort({ createdAt: -1, _id: -1 })\\n  .limit(limit);\\n```\\n\\n**When to Use Skip/Limit:**\\n- Small datasets (<10k documents)\\n- Need to jump to arbitrary pages\\n- Total count is required\\n\\nHope this helps!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/answers/{{new_answer_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "answers",
+                                "{{new_answer_id}}"
+                            ]
+                        },
+                        "description": "Update an existing answer (author only).\n\n**Authentication:** Required (must be answer author)\n\n**Path Parameters:**\n- `id`: Answer ID\n\n**Request Body:**\n```json\n{\n  \"body\": \"string (min 20 chars)\"\n}\n```\n\n**Response:** Updated Answer object with `isEdited: true`\n\n**Errors:**\n- 404: Answer not found\n- 403: Not authorized (not the author)\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Vote on Answer",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has voteCount', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.voteCount).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"value\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/answers/{{answer_id}}/vote",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "answers",
+                                "{{answer_id}}",
+                                "vote"
+                            ]
+                        },
+                        "description": "Vote on an answer (upvote or downvote).\n\n**Authentication:** Required\n\n**Path Parameters:**\n- `id`: Answer ID\n\n**Request Body:**\n```json\n{\n  \"value\": 1 | -1  // 1 for upvote, -1 for downvote\n}\n```\n\n**Response:**\n```json\n{\n  \"voteCount\": 5,\n  \"userVote\": 1\n}\n```\n\n**Behavior:**\n- First vote: Creates vote\n- Same value: Removes vote (toggle)\n- Different value: Changes vote\n- One vote per user per answer\n\n**Rate Limit:** 100 requests / 15 minutes"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Answer management endpoints"
+        },
+        {
+            "name": "Tags",
+            "item": [
+                {
+                    "name": "Get Top Tags",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response is array of tags', function() {",
+                                    "    const tags = pm.response.json();",
+                                    "    pm.expect(tags).to.be.an('array');",
+                                    "    if (tags.length > 0) {",
+                                    "        pm.expect(tags[0].name).to.exist;",
+                                    "        pm.expect(tags[0].count).to.be.a('number');",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/tags/top?limit=20",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "tags",
+                                "top"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "20",
+                                    "description": "Number of tags to return (max: 50, default: 20)"
+                                }
+                            ]
+                        },
+                        "description": "Get most popular tags by question count.\n\n**Authentication:** None required\n\n**Query Parameters:**\n- `limit` (number): Number of tags (max: 50, default: 20)\n\n**Response:**\n```json\n[\n  {\n    \"name\": \"javascript\",\n    \"count\": 125\n  },\n  {\n    \"name\": \"mongodb\",\n    \"count\": 87\n  },\n  {\n    \"name\": \"react\",\n    \"count\": 65\n  }\n]\n```\n\n**Note:** Calculated using MongoDB aggregation on Question.tags"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Tag aggregation endpoints"
+        },
+        {
+            "name": "Search",
+            "item": [
+                {
+                    "name": "Search Questions",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has search results', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.items).to.be.an('array');",
+                                    "    pm.expect(response.pagination).to.exist;",
+                                    "});",
+                                    "",
+                                    "pm.test('Results match search query', function() {",
+                                    "    const response = pm.response.json();",
+                                    "    const query = pm.variables.get('search_query');",
+                                    "    if (response.items.length > 0) {",
+                                    "        // At least one result should contain the search term",
+                                    "        const hasMatch = response.items.some(item => ",
+                                    "            item.title.toLowerCase().includes(query.toLowerCase()) ||",
+                                    "            item.body.toLowerCase().includes(query.toLowerCase())",
+                                    "        );",
+                                    "        pm.expect(hasMatch).to.be.true;",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "// Save search query for test",
+                                    "pm.variables.set('search_query', 'pagination');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}{{api_prefix}}/search?q=pagination&page=1&limit=10&tag=mongodb&sort=votes",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "{{api_prefix}}",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "pagination",
+                                    "description": "Search query (full-text search)"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "tag",
+                                    "value": "mongodb",
+                                    "description": "Filter by tag (optional)"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "votes",
+                                    "description": "Sort by: new | votes | answers"
+                                }
+                            ]
+                        },
+                        "description": "Full-text search across question titles and bodies.\n\n**Authentication:** Optional\n\n**Query Parameters:**\n- `q` (string, required): Search query\n- `page` (number): Page number (default: 1)\n- `limit` (number): Items per page (max: 50, default: 10)\n- `tag` (string): Filter by tag\n- `sort` (string): Sort by new | votes | answers (default: relevance)\n\n**Response:**\n```json\n{\n  \"items\": [\n    {\n      \"_id\": \"...\",\n      \"title\": \"How to implement pagination...\",\n      \"body\": \"...\",\n      \"tags\": [\"mongodb\"],\n      \"score\": 2.5,\n      \"answerCount\": 3,\n      \"voteCount\": 8,\n      \"createdAt\": \"...\"\n    }\n  ],\n  \"pagination\": {...}\n}\n```\n\n**Search Features:**\n- MongoDB text index on title and body\n- Stemming and stop words handled automatically\n- Results sorted by relevance score (unless sort specified)\n- Case-insensitive\n\n**Examples:**\n- `?q=async await javascript`\n- `?q=\"exact phrase\"`\n- `?q=react -hooks` (exclude terms with -)"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Search endpoints"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Global pre-request script",
+                    "console.log('🚀 Request:', pm.request.method, pm.request.url.toString());",
+                    "",
+                    "// Check if access token exists for authenticated requests",
+                    "if (pm.request.auth && pm.request.auth.type === 'bearer') {",
+                    "    const token = pm.environment.get('access_token');",
+                    "    if (!token) {",
+                    "        console.warn('⚠️  No access token found. Run \"Get Access Token\" first.');",
+                    "    }",
+                    "}"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Global test script",
+                    "const response = pm.response;",
+                    "",
+                    "// Log response",
+                    "console.log('📥 Response:', response.code, response.status);",
+                    "",
+                    "// Common error handling",
+                    "if (response.code === 401) {",
+                    "    console.error('❌ Unauthorized. Your token may have expired. Run \"Get Access Token\" again.');",
+                    "}",
+                    "",
+                    "if (response.code === 403) {",
+                    "    console.error('❌ Forbidden. You may not have permission for this action.');",
+                    "}",
+                    "",
+                    "if (response.code === 429) {",
+                    "    console.error('❌ Rate limit exceeded. Wait 15 minutes or check RATE_LIMIT_MAX.');",
+                    "}",
+                    "",
+                    "if (response.code >= 500) {",
+                    "    console.error('❌ Server error. Check API logs.');",
+                    "}"
+                ]
+            }
+        }
+    ]
+}

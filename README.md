@@ -9,6 +9,9 @@ A modern, AI-powered Q&A platform built with React, TypeScript, Express, and Mon
 ## 📚 Documentation
 
 - **[Production Readiness Assessment](PRODUCTION_READINESS.md)** - Complete production audit and deployment checklist
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to OpenAsk
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines and standards
+- **[Security Policy](SECURITY.md)** - Reporting vulnerabilities and security best practices
 - **[Postman API Collection](POSTMAN_COLLECTION.json)** - Ready-to-use API testing collection
 - **[Postman Setup Guide](POSTMAN_GUIDE.md)** - Detailed guide for API testing with Postman
 - **[API Documentation](apps/api/README.md)** - Complete API reference and examples
@@ -496,11 +499,13 @@ pnpm build
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+### Quick Start for Contributors
 
 1. **Fork the repository**
 2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+3. **Commit your changes** (`git commit -m 'feat: add amazing feature'`)
 4. **Push to the branch** (`git push origin feature/amazing-feature`)
 5. **Open a Pull Request**
 
@@ -508,10 +513,12 @@ We welcome contributions! Please follow these steps:
 
 - Write tests for new features
 - Follow TypeScript strict mode
-- Use conventional commits
+- Use conventional commits (see [CONTRIBUTING.md](CONTRIBUTING.md))
 - Update documentation
 - Ensure all tests pass
 - Follow existing code style
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## 📝 License
 

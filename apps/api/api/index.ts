@@ -22,7 +22,7 @@ async function ensureConnection() {
 // Vercel serverless handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     await ensureConnection();
-    
+
     // Pass the request to Express
     return app(req as any, res as any);
 }

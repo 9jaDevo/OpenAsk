@@ -16,8 +16,8 @@ export const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       baseUrl: import.meta.env.VITE_API_BASE_URL,
       getToken: async () => {
         try {
+          // Audience is already configured in Auth0Provider
           return await getAccessTokenSilently({
-            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
             cacheMode: 'off', // Force fresh token request
           });
         } catch (error) {

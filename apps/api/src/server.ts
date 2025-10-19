@@ -20,16 +20,18 @@ app.disable('x-powered-by');
 // Security headers
 app.use(helmet());
 
-// CORS restricted to WEB_ORIGIN
-const allowedOrigins = config.webOrigin.split(',').map(origin => origin.trim());
+// CORS configuration
+// Support both single origin and comma-separated multiple origins
+const allowedOrigins = config.webOrigin.split(',').map((origin) => origin.trim());
 
 app.use(
     cors({
         origin: (origin, callback) => {
-            // Allow requests with no origin (like mobile apps or curl requests)
+            // Allow requests with no origin (like mobile apps, curl, or Vercel health checks)
             if (!origin) return callback(null, true);
-            
-            if (allowedOrigins.indexOf(origin) !== -1) {
+
+            // Check if origin is in allowed list
+            if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
                 logger.warn({ origin, allowedOrigins }, 'CORS blocked request from unauthorized origin');
@@ -37,8 +39,10 @@ app.use(
             }
         },
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     })
-);
+);;
 
 // Request logging
 app.use(pinoHttp({ logger }));

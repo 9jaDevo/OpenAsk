@@ -4,6 +4,11 @@
     "devCommand": "pnpm dev",
     "installCommand": "cd ../.. && npx pnpm@9.15.0 install --no-frozen-lockfile --prod=false",
     "outputDirectory": "dist",
+    "functions": {
+        "dist/vercel.js": {
+            "maxDuration": 10
+        }
+    },
     "rewrites": [
         {
             "source": "/(.*)",

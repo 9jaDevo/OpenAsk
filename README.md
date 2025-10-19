@@ -6,6 +6,19 @@ A modern, AI-powered Q&A platform built with React, TypeScript, Express, and Mon
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 🌐 Live Demo
+
+**Try OpenAsk now!**
+- 🌍 **Web App**: [https://open-ask-web.vercel.app](https://open-ask-web.vercel.app)
+- 🔌 **API**: [https://open-ask-api-cdcq.vercel.app](https://open-ask-api-cdcq.vercel.app)
+- 📊 **API Health**: [https://open-ask-api-cdcq.vercel.app/health](https://open-ask-api-cdcq.vercel.app/health)
+
+**Demo Features:**
+- Browse 5 pre-seeded questions with AI-generated answers
+- Login with Auth0 to ask questions, post answers, and vote
+- Experience real-time AI draft answer generation
+- Test full-text search and tag filtering
+
 ## 📚 Documentation
 
 - **[Production Readiness Assessment](PRODUCTION_READINESS.md)** - Complete production audit and deployment checklist
@@ -550,40 +563,44 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📊 Project Status
 
 **Current Version:** 1.0.0  
-**Status:** ✅ Production Ready  
-**Last Updated:** October 18, 2025
+**Status:** 🚀 Live in Production  
+**Last Updated:** October 19, 2025  
+**Live Demo:** [https://open-ask-web.vercel.app](https://open-ask-web.vercel.app)
 
-### Completed Features (24/26)
-- ✅ Backend API with 11 endpoints
-- ✅ MongoDB integration with indexes
-- ✅ Auth0 authentication
-- ✅ AI-powered draft answers
-- ✅ Voting system
-- ✅ Full-text search
-- ✅ Tag-based filtering
-- ✅ Rate limiting
-- ✅ Markdown support
-- ✅ Docker setup
-- ✅ CI/CD pipeline
-- ✅ Comprehensive tests (57 tests, 70% passing)
-- ✅ Complete documentation
+### Completed Features ✅
+- ✅ **Full-Stack Application** - React frontend + Express backend deployed on Vercel
+- ✅ **Backend API** - 11 RESTful endpoints with complete CRUD operations
+- ✅ **Frontend Web App** - Responsive React app with Auth0 integration
+- ✅ **MongoDB Atlas** - Cloud database with indexes and seeded data
+- ✅ **Auth0 Authentication** - Secure JWT-based user authentication
+- ✅ **AI-Powered Answers** - Google Gemini integration for draft answer generation
+- ✅ **Voting System** - Upvote/downvote for questions and answers
+- ✅ **Full-Text Search** - MongoDB text indexes with relevance scoring
+- ✅ **Tag-Based Filtering** - Organize and discover content by tags
+- ✅ **Rate Limiting** - Protection against API abuse
+- ✅ **Markdown Support** - Safe HTML rendering with XSS prevention
+- ✅ **Docker Setup** - Containerization for local development
+- ✅ **CI/CD Pipeline** - Automated testing and deployment
+- ✅ **Comprehensive Tests** - 57 integration tests (70% passing)
+- ✅ **Complete Documentation** - API docs, guides, and examples
+- ✅ **Production Deployment** - Live on Vercel with MongoDB Atlas
 
-### Roadmap
-- [ ] Frontend implementation
-- [ ] Email notifications
-- [ ] User reputation system
-- [ ] Comment system
-- [ ] File uploads for images
+### Roadmap 🗺️
+- [ ] Email notifications for new answers
+- [ ] User reputation system with badges
+- [ ] Comment threads on answers
+- [ ] File uploads for code snippets and images
 - [ ] Real-time updates with WebSocket
-- [ ] Advanced search filters
-- [ ] Analytics dashboard
+- [ ] Advanced search filters (date range, author, etc.)
+- [ ] Analytics dashboard for admins
 - [ ] Mobile app (React Native)
+- [ ] Dark mode theme
+- [ ] Internationalization (i18n)
 
 ## 🐛 Known Issues
 
-- Some integration tests have validation issues (body length) - easily fixable
-- Frontend not yet implemented
-- Real-time updates not implemented (polling used instead)
+- Some integration tests have body length validation warnings (easily fixable)
+- Real-time updates use polling instead of WebSocket (optimization opportunity)
 
 ## 💡 Support
 

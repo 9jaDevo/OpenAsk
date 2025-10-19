@@ -4,5 +4,11 @@
     "devCommand": "pnpm dev",
     "installCommand": "cd ../.. && npx pnpm@9.15.0 install --no-frozen-lockfile",
     "framework": null,
-    "outputDirectory": "dist"
+    "outputDirectory": "dist",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
 }

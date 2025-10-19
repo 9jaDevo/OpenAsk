@@ -3,5 +3,11 @@
     "buildCommand": "cd ../.. && npx pnpm@9.15.0 --filter api build",
     "devCommand": "pnpm dev",
     "installCommand": "cd ../.. && npx pnpm@9.15.0 install --no-frozen-lockfile --prod=false",
-    "outputDirectory": "dist"
+    "outputDirectory": "dist",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/api"
+        }
+    ]
 }

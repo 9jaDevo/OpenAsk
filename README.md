@@ -22,17 +22,9 @@ A modern, AI-powered Q&A platform built with React, TypeScript, Express, and Mon
 
 Watch OpenAsk in action:
 
-<div align="center">
-  <iframe
-    src="https://player.cloudinary.com/embed/?cloud_name=maocular-tech-expert&public_id=videoplayback_f2mxmh&profile=cld-default"
-    width="640"
-    height="360"
-    style="height: auto; width: 100%; aspect-ratio: 640 / 360;"
-    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-    allowfullscreen
-    frameborder="0">
-  </iframe>
-</div>
+[![Watch the Demo](https://res.cloudinary.com/maocular-tech-expert/image/upload/fl_preserve_transparency/v1760885852/Most_Attractive_Youtube_Thumbnail_atcaxm.jpg?_s=public-apps)](https://player.cloudinary.com/embed/?cloud_name=maocular-tech-expert&public_id=videoplayback_f2mxmh&profile=cld-default)
+
+
 
 **[▶️ Watch on Cloudinary](https://player.cloudinary.com/embed/?cloud_name=maocular-tech-expert&public_id=videoplayback_f2mxmh&profile=cld-default)**
 

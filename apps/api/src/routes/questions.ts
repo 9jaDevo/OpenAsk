@@ -2,12 +2,13 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { authRequired, optionalAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { paginationSchema, createPaginationResult, calculateSkip } from '../utils/pagination.js';
+import { paginationSchema, calculateSkip } from '../utils/pagination.js';
 import { sanitizeMarkdown } from '../utils/sanitize.js';
 import { Question } from '../models/Question.js';
 import { User } from '../models/User.js';
 import { Vote } from '../models/Vote.js';
 import { generateDraftAnswer } from '../services/ai/gemini.js';
+import { logger } from '../logger.js';
 
 const router = Router();
 
@@ -109,8 +110,15 @@ router.get(
                 updatedAt: q.updatedAt,
             }));
 
-            const result = createPaginationResult(items, totalCount, { page, limit });
-            res.json(result);
+            // Convert pagination helper result into SDK-compatible shape
+            const totalPages = Math.ceil(totalCount / limit);
+            res.json({
+                questions: items,
+                total: totalCount,
+                page,
+                limit,
+                totalPages,
+            });
         } catch (error) {
             res.status(500).json({
                 error: 'InternalServerError',
@@ -177,6 +185,7 @@ router.post(
                 updatedAt: question.updatedAt,
             });
         } catch (error) {
+            logger.error(error, '❌ Failed to create question - Full error details');
             res.status(500).json({
                 error: 'InternalServerError',
                 message: 'Failed to create question',

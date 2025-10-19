@@ -49,7 +49,8 @@ router.get('/profile', authRequired, async (req: Request, res: Response) => {
 
 // Mount routers
 router.use('/questions', questionsRouter);
-router.use('/answers', answersRouter);
+router.use('/questions', answersRouter); // Mount answer routes under /questions for paths like /questions/:id/answers
+router.use('/answers', answersRouter); // Also mount for /answers/:id (update/vote)
 router.use('/tags', tagsRouter);
 router.use('/search', searchRouter);
 

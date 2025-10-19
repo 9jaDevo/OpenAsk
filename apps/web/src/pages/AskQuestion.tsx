@@ -100,14 +100,14 @@ export const AskQuestion: React.FC = () => {
                 onKeyDown={handleAddTag}
                 placeholder="Add tags (press Enter or comma to add)"
                 className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={tags.length >= 5}
+                disabled={(tags?.length ?? 0) >= 5}
               />
               {errors.tags && <p className="mt-1 text-sm text-red-600">{errors.tags.message}</p>}
               <p className="mt-1 text-sm text-gray-500">
                 Add up to 5 tags to help others find your question
               </p>
 
-              {tags.length > 0 && (
+              {(tags?.length ?? 0) > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {tags.map((tag) => (
                     <span

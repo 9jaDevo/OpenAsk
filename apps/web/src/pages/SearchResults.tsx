@@ -57,7 +57,7 @@ export const SearchResults: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-              <p className="text-gray-600 mt-1">{loading ? 'Searching…' : `${results.length} results on this page`}</p>
+              <p className="text-gray-600 mt-1">{loading ? 'Searching…' : `${(results?.length ?? 0)} results on this page`}</p>
             </div>
 
             {/* Sort */}

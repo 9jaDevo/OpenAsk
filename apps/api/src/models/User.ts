@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
     sub: string; // Auth0 subject ID
-    email: string;
+    email?: string;
     name?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -18,8 +18,9 @@ const userSchema = new Schema<IUser>(
         },
         email: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
+            sparse: true, // Allow multiple null values
             index: true,
         },
         name: {

@@ -17,7 +17,8 @@ const voteParamsSchema = z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid ID'),
 });
 
-// POST /api/v1/questions/:id/vote - Vote on question
+// POST /api/v1/answers/:id/vote OR /api/v1/questions/:id/vote
+// This route handles both answer and question votes based on the base URL
 router.post(
     '/:id/vote',
     authRequired,
@@ -31,24 +32,31 @@ router.post(
             const { id } = req.params;
             const { value } = req.body;
 
-            const question = await Question.findById(id);
-            if (!question) {
+            // Determine if this is a question or answer vote based on baseUrl
+            const isAnswerVote = req.baseUrl.includes('/answers');
+            const targetType: VoteTargetType = isAnswerVote ? 'answer' : 'question';
+
+            // Find the target document
+            const target = isAnswerVote ? await Answer.findById(id) : await Question.findById(id);
+
+            if (!target) {
                 return res.status(404).json({
                     error: 'NotFound',
-                    message: 'Question not found',
+                    message: `${isAnswerVote ? 'Answer' : 'Question'} not found`,
                 });
             }
 
-            await handleVote('question', id, req.user.sub, value);
+            // Handle the vote
+            await handleVote(targetType, id, req.user.sub, value);
 
             // Recalculate vote count
-            const voteCount = await calculateVoteCount('question', id);
-            question.voteCount = voteCount;
-            await question.save();
+            const voteCount = await calculateVoteCount(targetType, id);
+            target.voteCount = voteCount;
+            await target.save();
 
             // Get user's current vote
             const userVote = await Vote.findOne({
-                targetType: 'question',
+                targetType,
                 targetId: id,
                 userId: req.user.sub,
             }).lean();
@@ -57,8 +65,9 @@ router.post(
                 voteCount,
                 userVote: userVote ? userVote.value : null,
             });
-        } catch (error: any) {
-            if (error.code === 11000) {
+        } catch (error: unknown) {
+            const err = error as { code?: number };
+            if (err.code === 11000) {
                 return res.status(409).json({
                     error: 'Conflict',
                     message: 'Vote conflict, please try again',
@@ -66,62 +75,7 @@ router.post(
             }
             res.status(500).json({
                 error: 'InternalServerError',
-                message: 'Failed to vote on question',
-            });
-        }
-    }
-);
-
-// POST /api/v1/answers/:id/vote - Vote on answer
-router.post(
-    '/:id/vote',
-    authRequired,
-    validate({ params: voteParamsSchema, body: voteBodySchema }),
-    async (req: Request, res: Response) => {
-        try {
-            if (!req.user) {
-                return res.status(401).json({ error: 'Unauthorized', message: 'User not authenticated' });
-            }
-
-            const { id } = req.params;
-            const { value } = req.body;
-
-            const answer = await Answer.findById(id);
-            if (!answer) {
-                return res.status(404).json({
-                    error: 'NotFound',
-                    message: 'Answer not found',
-                });
-            }
-
-            await handleVote('answer', id, req.user.sub, value);
-
-            // Recalculate vote count
-            const voteCount = await calculateVoteCount('answer', id);
-            answer.voteCount = voteCount;
-            await answer.save();
-
-            // Get user's current vote
-            const userVote = await Vote.findOne({
-                targetType: 'answer',
-                targetId: id,
-                userId: req.user.sub,
-            }).lean();
-
-            res.json({
-                voteCount,
-                userVote: userVote ? userVote.value : null,
-            });
-        } catch (error: any) {
-            if (error.code === 11000) {
-                return res.status(409).json({
-                    error: 'Conflict',
-                    message: 'Vote conflict, please try again',
-                });
-            }
-            res.status(500).json({
-                error: 'InternalServerError',
-                message: 'Failed to vote on answer',
+                message: 'Failed to process vote',
             });
         }
     }

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { optionalAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { paginationSchema, createPaginationResult, calculateSkip } from '../utils/pagination.js';
+import { paginationSchema, calculateSkip } from '../utils/pagination.js';
 import { Question } from '../models/Question.js';
 import { Vote } from '../models/Vote.js';
 
@@ -78,8 +78,15 @@ router.get('/', optionalAuth, validate({ query: searchQuerySchema }), async (req
             updatedAt: q.updatedAt,
         }));
 
-        const result = createPaginationResult(items, totalCount, { page, limit });
-        res.json(result);
+        // Return SDK-compatible pagination shape
+        const totalPages = Math.ceil(totalCount / limit);
+        res.json({
+            questions: items,
+            total: totalCount,
+            page,
+            limit,
+            totalPages,
+        });
     } catch (error) {
         res.status(500).json({
             error: 'InternalServerError',

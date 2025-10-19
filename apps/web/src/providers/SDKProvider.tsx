@@ -16,8 +16,12 @@ export const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       baseUrl: import.meta.env.VITE_API_BASE_URL,
       getToken: async () => {
         try {
-          return await getAccessTokenSilently();
+          return await getAccessTokenSilently({
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+            cacheMode: 'off', // Force fresh token request
+          });
         } catch (error) {
+          console.error('Failed to get access token:', error);
           return null;
         }
       },

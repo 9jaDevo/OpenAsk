@@ -33,10 +33,15 @@ export const Home: React.FC = () => {
         sdk.getTopTags(),
       ]);
 
+      console.log('🔍 Questions API Response:', questionsData);
+      console.log('🔍 Questions array:', questionsData.questions);
+      console.log('🔍 Questions length:', questionsData.questions?.length);
+
       setQuestions(questionsData.questions);
       setTotalPages(questionsData.totalPages);
       setTags(tagsData);
     } catch (err) {
+      console.error('❌ Error loading questions:', err);
       setError(err instanceof Error ? err.message : 'Failed to load questions');
     } finally {
       setLoading(false);
@@ -109,7 +114,7 @@ export const Home: React.FC = () => {
             </div>
           ) : error ? (
             <ErrorState message={error} onRetry={loadData} />
-          ) : questions.length === 0 ? (
+          ) : (questions?.length ?? 0) === 0 ? (
             <EmptyState
               title="No questions found"
               message={searchQuery || tag ? 'Try adjusting your search or filters' : 'Be the first to ask a question!'}
@@ -198,7 +203,7 @@ export const Home: React.FC = () => {
         <div className="lg:col-span-1">
           <Card>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Trending Tags</h3>
-            {tags.length === 0 ? (
+            {(tags?.length ?? 0) === 0 ? (
               <p className="text-gray-500 text-sm">No tags yet</p>
             ) : (
               <div className="flex flex-wrap gap-2">

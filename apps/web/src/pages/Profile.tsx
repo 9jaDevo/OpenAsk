@@ -126,7 +126,7 @@ export const Profile: React.FC = () => {
 
         {/* Tab Content */}
         {activeTab === 'questions' ? (
-          myQuestions.length === 0 ? (
+          (myQuestions?.length ?? 0) === 0 ? (
             <EmptyState
               title="No questions yet"
               message="You haven't asked any questions. Start by asking your first question!"

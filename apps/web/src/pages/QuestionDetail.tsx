@@ -149,7 +149,7 @@ export const QuestionDetail: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {question.tags.map((tag: string) => (
+                  {(question.tags || []).map((tag: string) => (
                   <Link key={tag} to={`/?tag=${tag}`}>
                     <Tag>{tag}</Tag>
                   </Link>
@@ -193,8 +193,8 @@ export const QuestionDetail: React.FC = () => {
 
         {/* Community Answers */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {answers.length} Community {answers.length === 1 ? 'Answer' : 'Answers'}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {(answers?.length ?? 0)} Community {(answers?.length ?? 0) === 1 ? 'Answer' : 'Answers'}
           </h2>
 
           <div className="space-y-4">

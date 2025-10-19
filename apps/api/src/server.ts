@@ -21,9 +21,21 @@ app.disable('x-powered-by');
 app.use(helmet());
 
 // CORS restricted to WEB_ORIGIN
+const allowedOrigins = config.webOrigin.split(',').map(origin => origin.trim());
+
 app.use(
     cors({
-        origin: config.webOrigin,
+        origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+            
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                logger.warn({ origin, allowedOrigins }, 'CORS blocked request from unauthorized origin');
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true,
     })
 );

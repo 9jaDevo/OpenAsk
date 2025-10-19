@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "."
   },
   "include": ["src/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist", "**/__tests__/**", "scripts"]

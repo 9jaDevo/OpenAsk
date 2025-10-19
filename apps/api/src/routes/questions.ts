@@ -149,7 +149,7 @@ router.post(
             if (!user) {
                 user = await User.create({
                     sub: req.user.sub,
-                    email: req.user.email || '',
+                    email: req.user.email || undefined,
                     name: req.user.name,
                 });
             }

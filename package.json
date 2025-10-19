@@ -5,6 +5,7 @@
     "description": "Open-source community Q&A platform with AI-powered draft answers",
     "author": "OpenAsk Contributors",
     "license": "MIT",
+    "packageManager": "pnpm@9.15.0",
     "workspaces": [
         "apps/*",
         "packages/*"

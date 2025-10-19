@@ -3,11 +3,5 @@
     "buildCommand": "cd ../.. && npx pnpm@9.15.0 --filter api build",
     "devCommand": "pnpm dev",
     "installCommand": "cd ../.. && npx pnpm@9.15.0 install --no-frozen-lockfile --prod=false",
-    "outputDirectory": "dist",
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "/vercel.js"
-        }
-    ]
+    "outputDirectory": "dist"
 }
